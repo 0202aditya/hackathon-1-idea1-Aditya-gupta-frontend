@@ -7,7 +7,7 @@ export function BookView({ trip }: { trip: PreviewTrip }) {
   return (
     <div className="mx-auto grid max-w-5xl gap-6 px-4 py-8 sm:py-12 lg:grid-cols-[1.4fr_0.8fr]">
       <div>
-        <p className="inline-flex rounded-full bg-rust/15 px-3 py-1 text-sm font-medium text-rust">
+        <p className="inline-flex rounded-full bg-glow/15 px-3 py-1 text-sm font-medium text-glow">
           Demo booking: test mode, no real payment
         </p>
         <h1 className="mt-4 font-display text-3xl tracking-tight sm:text-4xl">Passenger</h1>
@@ -68,7 +68,7 @@ export function BookView({ trip }: { trip: PreviewTrip }) {
       <aside className="h-fit rounded-3xl border border-line bg-card p-5">
         <h2 className="font-display text-xl">Price</h2>
         <p className="mt-1 text-sm text-foreground/60">{trip.title}</p>
-        <p className="mt-4 font-display text-4xl text-rust">{trip.hacked}</p>
+        <p className="mt-4 font-display text-4xl text-mint">{trip.hacked}</p>
         <p className="text-sm text-foreground/60">Hacked price · normal was {trip.normal}</p>
         <dl className="mt-4 space-y-2 text-sm">
           <div className="flex justify-between gap-3">

@@ -26,7 +26,7 @@ function AppNav({ pathname, className }: { pathname: string | null; className: s
             key={link.href}
             href={link.href}
             className={`shrink-0 rounded-full px-3 py-1.5 text-sm ${
-              active ? "bg-sand text-foreground" : "text-foreground/70 hover:bg-background hover:text-foreground"
+              active ? "bg-dusk text-mist" : "text-mist/70 hover:bg-white/10 hover:text-mist"
             }`}
           >
             {link.label}
@@ -47,9 +47,9 @@ function Header({
   user: ReturnType<typeof useSessionUser>;
 }) {
   return (
-    <header className="sticky top-0 z-20 border-b border-line bg-card/95 backdrop-blur">
+    <header className="sticky top-0 z-20 border-b border-line bg-night/90 text-mist backdrop-blur">
       <div className="mx-auto flex max-w-5xl items-center justify-between gap-3 px-4 py-3">
-        <Link href="/" className="font-display text-lg font-semibold tracking-tight">
+        <Link href="/" className="font-display text-lg font-extrabold tracking-tight">
           Una Milla
         </Link>
         {showAppNav ? (

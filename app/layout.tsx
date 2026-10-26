@@ -1,18 +1,18 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
-import { Hanken_Grotesk, Space_Grotesk } from "next/font/google";
+import { Bricolage_Grotesque, Instrument_Sans } from "next/font/google";
 import { SiteFooter } from "@/components/site-footer";
 import { HeaderFallback, SiteHeader } from "@/components/site-header";
 import "./globals.css";
 
-const sans = Hanken_Grotesk({
+const sans = Instrument_Sans({
   subsets: ["latin"],
-  variable: "--font-hanken",
+  variable: "--font-body-face",
 });
 
-const display = Space_Grotesk({
+const display = Bricolage_Grotesque({
   subsets: ["latin"],
-  variable: "--font-space",
+  variable: "--font-display-face",
 });
 
 export const metadata: Metadata = {

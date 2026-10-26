@@ -1,33 +1,96 @@
 @import "tailwindcss";
 
 :root {
-  --background: #f6f1e9;
-  --foreground: #231a12;
-  --rust: #b5622e;
-  --sand: #e6d5bf;
-  --card: #fcf9f3;
-  --line: #ddcbb4;
+  --background: #0e1b3d;
+  --foreground: #f4f0ff;
+  --night: #0e1b3d;
+  --dusk: #4a3b8c;
+  --glow: #ff8f5a;
+  --marigold: #ffb627;
+  --mint: #7fe3c2;
+  --mist: #f4f0ff;
+  --card: #131d45;
+  --line: #2a3566;
+  --sand: #243056;
+  --rust: #ffb627;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --color-rust: var(--rust);
-  --color-sand: var(--sand);
+  --color-night: var(--night);
+  --color-dusk: var(--dusk);
+  --color-glow: var(--glow);
+  --color-marigold: var(--marigold);
+  --color-mint: var(--mint);
+  --color-mist: var(--mist);
   --color-card: var(--card);
   --color-line: var(--line);
-  --font-sans: var(--font-hanken);
-  --font-display: var(--font-space);
+  --color-sand: var(--sand);
+  --color-rust: var(--rust);
+  --font-sans: var(--font-body-face);
+  --font-display: var(--font-display-face);
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: var(--font-hanken), sans-serif;
+  font-family: var(--font-body-face), sans-serif;
+  line-height: 1.55;
+  color-scheme: dark;
 }
 
 h1,
 h2,
 h3 {
-  font-family: var(--font-space), sans-serif;
+  font-family: var(--font-display-face), sans-serif;
+  font-weight: 800;
+  letter-spacing: -0.035em;
+}
+
+.flight-arc {
+  stroke-dasharray: 6 9;
+  animation: fly 3.2s ease-out both;
+}
+
+@keyframes fly {
+  from {
+    stroke-dashoffset: 900;
+    opacity: 0;
+  }
+  to {
+    stroke-dashoffset: 0;
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .flight-arc {
+    animation: none;
+  }
+}
+
+.ticket-perf {
+  position: relative;
+  margin: 20px -26px;
+  border-top: 2px dashed rgba(244, 240, 255, 0.3);
+}
+
+.ticket-perf::before,
+.ticket-perf::after {
+  content: "";
+  position: absolute;
+  top: -13px;
+  width: 24px;
+  height: 24px;
+  border-radius: 999px;
+  background: #2c2a66;
+}
+
+.ticket-perf::before {
+  left: -12px;
+}
+
+.ticket-perf::after {
+  right: -12px;
 }

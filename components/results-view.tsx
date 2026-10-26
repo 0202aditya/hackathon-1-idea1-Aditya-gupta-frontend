@@ -19,7 +19,7 @@ export function ResultsView({ trip }: { trip: PreviewTrip }) {
       <p className="mt-8 text-sm font-medium uppercase tracking-[0.14em] text-foreground/55">
         You save
       </p>
-      <p className="font-display text-6xl tracking-tight text-rust sm:text-8xl">{trip.savings}</p>
+      <p className="font-display text-6xl tracking-tight text-mint sm:text-8xl">{trip.savings}</p>
       <p className="mt-1 text-foreground/70">{trip.savingsPct}</p>
 
       <div className="mt-8 grid gap-3 sm:grid-cols-2">
@@ -40,7 +40,7 @@ export function ResultsView({ trip }: { trip: PreviewTrip }) {
         </div>
       </dl>
 
-      <p className="mt-4 inline-flex rounded-full bg-foreground px-3 py-1 text-sm text-card">
+      <p className="mt-4 inline-flex rounded-full bg-marigold px-3 py-1 text-sm font-semibold text-[#2a1a00]">
         Best card · {trip.bestCard}
       </p>
 
@@ -64,7 +64,7 @@ export function ResultsView({ trip }: { trip: PreviewTrip }) {
         <ol className="mt-3 space-y-3">
           {trip.steps.map((step, index) => (
             <li key={step.title} className="flex gap-3 rounded-2xl bg-card p-4">
-              <span className="font-display text-lg text-rust">{index + 1}</span>
+              <span className="font-display text-lg text-marigold">{index + 1}</span>
               <span>
                 <span className="block font-medium">{step.title}</span>
                 <span className="mt-1 block text-sm leading-relaxed text-foreground/70">
@@ -80,7 +80,7 @@ export function ResultsView({ trip }: { trip: PreviewTrip }) {
         {trip.warnings.map((warning) => (
           <li
             key={warning}
-            className="rounded-2xl border border-rust/40 bg-rust/10 px-4 py-3 text-sm"
+            className="rounded-2xl border border-glow/40 bg-glow/15 px-4 py-3 text-sm"
           >
             {warning}
           </li>
@@ -115,9 +115,11 @@ function PriceTile({
   emphasis?: boolean;
 }) {
   return (
-    <div className={`rounded-2xl border p-4 ${emphasis ? "border-rust bg-card" : "border-line bg-card"}`}>
+    <div className={`rounded-2xl border p-4 ${emphasis ? "border-mint bg-card" : "border-line bg-card"}`}>
       <p className="text-sm text-foreground/60">{label}</p>
-      <p className="mt-1 font-display text-3xl">{amount}</p>
+      <p className={`mt-1 font-display text-3xl ${emphasis ? "text-mint" : "text-mist/50 line-through"}`}>
+        {amount}
+      </p>
     </div>
   );
 }
