@@ -102,7 +102,7 @@ export function WalletScreen() {
                   type="button"
                   disabled={added}
                   onClick={() => addCard(card.id)}
-                  className="flex w-full items-center justify-between px-3 py-2.5 text-left text-sm hover:bg-sand/40 disabled:cursor-default disabled:text-foreground/40"
+                  className="flex w-full items-center justify-between px-3 py-2.5 text-left text-sm hover:bg-white/10 disabled:cursor-default disabled:text-mist/35"
                 >
                   <span>
                     {card.name}

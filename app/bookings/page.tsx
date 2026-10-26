@@ -15,7 +15,7 @@ export default function BookingsPage() {
           <li key={trip.id}>
             <Link
               href={`/bookings/${trip.id}`}
-              className="block rounded-3xl border border-line bg-card p-4 transition hover:border-rust"
+              className="block rounded-3xl border border-line bg-card p-4 transition hover:border-marigold"
             >
               <span className="flex items-start justify-between gap-3">
                 <span>
@@ -24,7 +24,7 @@ export default function BookingsPage() {
                     {trip.reference} · {trip.cabin}
                   </span>
                 </span>
-                <span className="font-display text-xl">{trip.hacked}</span>
+                <span className="font-display text-xl text-mint">{trip.hacked}</span>
               </span>
             </Link>
           </li>

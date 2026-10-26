@@ -30,7 +30,7 @@ export function PlanForm() {
         This is the form only. Submitting opens a sample result, it does not search flights.
       </p>
 
-      <div className="mt-6 grid grid-cols-2 rounded-full bg-sand/70 p-1">
+      <div className="mt-6 grid grid-cols-2 rounded-full bg-white/10 p-1">
         {(
           [
             ["quick", "Quick flight"],
@@ -42,7 +42,7 @@ export function PlanForm() {
             type="button"
             onClick={() => setMode(value)}
             className={`rounded-full px-3 py-2 text-sm font-medium ${
-              mode === value ? "bg-card shadow-sm" : "text-foreground/70"
+              mode === value ? "bg-dusk text-mist" : "text-mist/70"
             }`}
           >
             {label}
@@ -75,7 +75,7 @@ export function PlanForm() {
                 type="checkbox"
                 checked={showReturn}
                 onChange={(event) => setShowReturn(event.target.checked)}
-                className="size-4 accent-rust"
+                className="size-4 accent-marigold"
               />
               Add a return
             </label>
