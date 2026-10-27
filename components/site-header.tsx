@@ -8,6 +8,7 @@ import { useSessionUser } from "@/components/auth/use-session-user";
 const links = [
   { href: "/wallet", label: "Wallet" },
   { href: "/plan", label: "Plan a Trip" },
+  { href: "/searches", label: "Searched Trips" },
   { href: "/bookings", label: "Bookings" },
 ];
 

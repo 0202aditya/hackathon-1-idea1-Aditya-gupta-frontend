@@ -1,6 +1,6 @@
 // Frontend/lib/data/trips.ts
 import { apiFetch } from "@/lib/api";
-import { AiPlan, FlightOffer, SavingsResult, TripInput } from "@/lib/api-types";
+import { AiPlan, FlightOffer, SavingsResult, SearchedTrip, TripInput } from "@/lib/api-types";
 
 export type TripResponse = {
   tripId: string;
@@ -23,6 +23,10 @@ export async function createTrip(input: TripInput): Promise<TripResponse> {
 
 export async function getTrip(tripId: string): Promise<TripDetails> {
   return apiFetch<TripDetails>(`/api/trips/${tripId}`);
+}
+
+export async function getSearchedTrips(): Promise<SearchedTrip[]> {
+  return apiFetch<SearchedTrip[]>("/api/trips");
 }
 
 export async function getTripSavings(

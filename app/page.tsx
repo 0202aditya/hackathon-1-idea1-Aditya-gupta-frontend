@@ -57,7 +57,14 @@ export default function Home() {
         <Link href="/wallet" className={`${primaryClass} text-center text-base px-8 py-3.5`}>
           {isLoggedIn ? "Manage your Wallet →" : "Set up your cards & savings →"}
         </Link>
-        {!isLoggedIn && (
+        {isLoggedIn ? (
+          <Link
+            href="/searches"
+            className="rounded-full border border-line bg-card px-6 py-3.5 text-center text-sm font-semibold text-mist hover:border-white/30 transition-colors"
+          >
+            View Searched Trips →
+          </Link>
+        ) : (
           <Link
             href="/signup"
             className="rounded-full border border-line bg-card px-6 py-3.5 text-center text-sm font-semibold text-mist hover:border-white/30 transition-colors"

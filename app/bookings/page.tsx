@@ -7,9 +7,17 @@ export default function BookingsPage() {
   return (
     <div className="mx-auto max-w-2xl px-4 py-8 sm:py-12">
       <h1 className="font-display text-3xl tracking-tight sm:text-4xl">My bookings</h1>
-      <p className="mt-2 text-sm text-foreground/70">
-        Two sample bookings so you can open a confirmation. They are not saved to an account.
-      </p>
+      <div className="mt-4 rounded-2xl border border-line bg-card p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+        <p className="text-sm text-foreground/80">
+          Looking for flights you recently searched? Check your saved calculations and AI recommendations.
+        </p>
+        <Link
+          href="/searches"
+          className="shrink-0 text-sm font-semibold text-mint hover:underline"
+        >
+          View Searched Trips →
+        </Link>
+      </div>
       <ul className="mt-6 space-y-3">
         {items.map((trip) => (
           <li key={trip.id}>
