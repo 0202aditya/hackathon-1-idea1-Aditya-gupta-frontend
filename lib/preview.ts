@@ -29,29 +29,29 @@ export const trips: Record<PreviewId, PreviewTrip> = {
     cabin: "Economy",
     summary: "One way · 1 passenger",
     flight: "IndiGo · nonstop · 18 Nov 2026",
-    normal: "₹8,240",
-    hacked: "₹4,628",
-    savings: "₹3,612",
+    normal: "€82.40",
+    hacked: "€46.28",
+    savings: "€36.12",
     savingsPct: "44% under the normal fare",
-    held: "₹3,200",
-    heldNote: "8,000 HDFC Infinia points",
-    earned: "₹412",
+    held: "€32.00",
+    heldNote: "3,200 HDFC Infinia points",
+    earned: "€4.12",
     bestCard: "HDFC Infinia",
     alternatives: [
-      { card: "Axis Atlas", note: "Would save ₹2,140 instead" },
+      { card: "Axis Atlas", note: "Would save €21.40 instead" },
     ],
     steps: [
       {
         title: "Keep the Infinia points for this fare",
-        detail: "They cover ₹3,200 of the Delhi–Mumbai ticket at the sample value.",
+        detail: "They cover €32.00 of the Delhi–Mumbai ticket at the sample value.",
       },
       {
         title: "Pay the rest with Infinia",
-        detail: "The remaining ₹5,040 still earns rewards on the flight category.",
+        detail: "The remaining €50.40 still earns rewards on the flight category.",
       },
       {
         title: "Count the new rewards",
-        detail: "That purchase earns about ₹412 back, on top of the points you already hold.",
+        detail: "That purchase earns about €4.12 back, on top of the points you already hold.",
       },
       {
         title: "Skip Atlas for this route",
@@ -67,7 +67,7 @@ export const trips: Record<PreviewId, PreviewTrip> = {
       "These fares are sample numbers so you can click through the screens.",
     ],
     assumptions: [
-      "Infinia points valued at 40 paise for this sample.",
+      "Infinia points valued at 1 cent for this sample.",
       "Flight earn rate used for the new-rewards line only.",
       "Rates shown as verified 1 Oct 2026.",
     ],
@@ -87,21 +87,21 @@ export const trips: Record<PreviewId, PreviewTrip> = {
     cabin: "Business",
     summary: "Three legs · 1 passenger",
     flight: "Emirates · 4–12 Dec 2026",
-    normal: "₹1,86,400",
-    hacked: "₹1,35,080",
-    savings: "₹51,320",
+    normal: "€1,864.00",
+    hacked: "€1,350.80",
+    savings: "€513.20",
     savingsPct: "28% under the normal fare",
-    held: "₹42,000",
+    held: "€420.00",
     heldNote: "28,000 Axis Atlas points",
-    earned: "₹9,320",
+    earned: "€93.20",
     bestCard: "Axis Atlas",
     alternatives: [
-      { card: "HDFC Infinia", note: "Would save ₹36,800 instead" },
+      { card: "HDFC Infinia", note: "Would save €368.00 instead" },
     ],
     steps: [
       {
         title: "Use Atlas points on the long haul",
-        detail: "The sample puts ₹42,000 of value against the business fare.",
+        detail: "The sample puts €420.00 of value against the business fare.",
       },
       {
         title: "Pay Dubai and the taxes with Atlas",
@@ -109,7 +109,7 @@ export const trips: Record<PreviewId, PreviewTrip> = {
       },
       {
         title: "Add the rewards this booking earns",
-        detail: "New points on the unpaid part come to about ₹9,320.",
+        detail: "New points on the unpaid part come to about €93.20.",
       },
       {
         title: "Leave Infinia for a cash-heavy month",
@@ -125,7 +125,7 @@ export const trips: Record<PreviewId, PreviewTrip> = {
       "A real search would replace these sample fares.",
     ],
     assumptions: [
-      "Atlas points valued at ₹1.50 for this sample.",
+      "Atlas points valued at €1.50 for this sample.",
       "One cabin for the whole trip: Business.",
       "Rates shown as verified 1 Oct 2026.",
     ],

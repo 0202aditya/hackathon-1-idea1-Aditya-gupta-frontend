@@ -29,6 +29,12 @@ export async function getSearchedTrips(): Promise<SearchedTrip[]> {
   return apiFetch<SearchedTrip[]>("/api/trips");
 }
 
+export async function deleteTrip(tripId: string): Promise<{ ok: boolean }> {
+  return apiFetch<{ ok: boolean }>(`/api/trips/${tripId}`, {
+    method: "DELETE",
+  });
+}
+
 export async function getTripSavings(
   tripId: string,
   offerId?: string
@@ -47,4 +53,23 @@ export async function getTripPlan(
     method: "POST",
     body: JSON.stringify({ offerId }),
   });
+}
+
+export type BookingRecord = {
+  id: string;
+  duffelOrderId?: string;
+  offerId: string;
+  status: string;
+  totalMinor?: number;
+  currency?: string;
+  bookingReference?: string;
+  recommendedCardId?: string;
+  createdAt: string;
+  trips?: {
+    input?: TripInput;
+  };
+};
+
+export async function getBookings(): Promise<BookingRecord[]> {
+  return apiFetch<BookingRecord[]>("/api/bookings");
 }

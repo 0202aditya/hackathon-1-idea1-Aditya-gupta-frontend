@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { primaryClass } from "@/lib/classes";
 import { formatMoney, formatDate } from "@/lib/format";
-import { getSearchedTrips } from "@/lib/data/trips";
+import { getSearchedTrips, deleteTrip } from "@/lib/data/trips";
 import { SearchedTrip } from "@/lib/api-types";
 import { useSessionUser } from "@/components/auth/use-session-user";
 
@@ -12,6 +12,7 @@ export default function SearchesPage() {
   const user = useSessionUser();
   const [trips, setTrips] = useState<SearchedTrip[]>([]);
   const [loading, setLoading] = useState(true);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
 
   useEffect(() => {
     async function load() {
@@ -27,6 +28,20 @@ export default function SearchesPage() {
     }
     load();
   }, [user]);
+
+  async function handleDelete(tripId: string) {
+    if (!confirm("Are you sure you want to delete this searched trip?")) return;
+    try {
+      setDeletingId(tripId);
+      await deleteTrip(tripId);
+      setTrips((prev) => prev.filter((t) => t.id !== tripId));
+    } catch (err) {
+      console.error("Failed to delete trip:", err);
+      alert("Failed to delete trip. Please try again.");
+    } finally {
+      setDeletingId(null);
+    }
+  }
 
   return (
     <div className="mx-auto max-w-4xl px-4 py-8 sm:py-12">
@@ -106,9 +121,19 @@ export default function SearchesPage() {
                       {travelDate}
                     </span>
                   </div>
-                  <span className="text-xs text-foreground/50">
-                    Searched {item.createdAt ? formatDate(item.createdAt) : "Recently"}
-                  </span>
+                  <div className="flex items-center gap-3">
+                    <span className="text-xs text-foreground/50">
+                      Searched {item.createdAt ? formatDate(item.createdAt) : "Recently"}
+                    </span>
+                    <button
+                      type="button"
+                      disabled={deletingId === item.id}
+                      onClick={() => handleDelete(item.id)}
+                      className="text-xs font-medium text-rust hover:underline disabled:opacity-50 cursor-pointer"
+                    >
+                      {deletingId === item.id ? "Deleting…" : "Delete"}
+                    </button>
+                  </div>
                 </div>
 
                 {/* Route Title & Airline */}
@@ -211,3 +236,4 @@ export default function SearchesPage() {
     </div>
   );
 }
+
