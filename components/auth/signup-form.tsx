@@ -42,7 +42,7 @@ export function SignupForm({ className }: { className?: string }) {
         password,
         options: {
           data: { full_name: fullName },
-          emailRedirectTo: `${window.location.origin}/auth/callback?next=/plan`,
+          emailRedirectTo: `${window.location.origin}/auth/callback?next=/wallet`,
         },
       });
       if (error) {
@@ -54,7 +54,7 @@ export function SignupForm({ className }: { className?: string }) {
         setNotice(`Check ${email} for a confirmation link to finish signing up.`);
         return;
       }
-      router.replace("/plan");
+      router.replace("/wallet");
       router.refresh();
     } catch (err) {
       setError(authErrorMessage(err));

@@ -23,7 +23,7 @@ export function AuthControl({ user }: { user: User | null | undefined }) {
     try {
       const { error } = await createClient().auth.signOut();
       if (error) throw error;
-      router.replace("/login");
+      router.replace("/");
       router.refresh();
     } catch (err) {
       console.error("Sign out failed:", err);

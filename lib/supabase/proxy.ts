@@ -34,7 +34,7 @@ export async function updateSession(request: NextRequest) {
   }
 
   if (isAuthenticated && (pathname === "/login" || pathname === "/signup")) {
-    return redirectWithSessionCookies(request, response, "/plan");
+    return redirectWithSessionCookies(request, response, "/wallet");
   }
 
   return response;

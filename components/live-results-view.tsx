@@ -1,10 +1,11 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { primaryClass } from "@/lib/classes";
 import { formatMoney, formatTime, formatDate } from "@/lib/format";
-import { FlightOffer, TripInput } from "@/lib/api-types";
+import { AiPlan, FlightOffer, SavingsResult, TripInput } from "@/lib/api-types";
+import { getTripPlan, getTripSavings } from "@/lib/data/trips";
 
 export function LiveResultsView({
   tripId,
@@ -19,8 +20,51 @@ export function LiveResultsView({
     offers[0]?.offerId || ""
   );
 
+  const [savings, setSavings] = useState<SavingsResult | null>(null);
+  const [aiPlan, setAiPlan] = useState<AiPlan | null>(null);
+  const [loadingSavings, setLoadingSavings] = useState(true);
+  const [loadingAi, setLoadingAi] = useState(true);
+
   const selectedOffer =
     offers.find((o) => o.offerId === selectedOfferId) || offers[0];
+
+  // Fetch deterministic card savings & AI strategy whenever the selected offer changes
+  useEffect(() => {
+    if (!selectedOfferId) return;
+
+    let active = true;
+
+    async function loadCalculations() {
+      setLoadingSavings(true);
+      setLoadingAi(true);
+
+      try {
+        const s = await getTripSavings(tripId, selectedOfferId);
+        if (active) {
+          setSavings(s);
+          setLoadingSavings(false);
+        }
+
+        const plan = await getTripPlan(tripId, selectedOfferId);
+        if (active) {
+          setAiPlan(plan);
+          setLoadingAi(false);
+        }
+      } catch (err) {
+        console.error("Failed to load savings or AI plan:", err);
+        if (active) {
+          setLoadingSavings(false);
+          setLoadingAi(false);
+        }
+      }
+    }
+
+    loadCalculations();
+
+    return () => {
+      active = false;
+    };
+  }, [tripId, selectedOfferId]);
 
   if (!offers || offers.length === 0) {
     return (
@@ -36,10 +80,16 @@ export function LiveResultsView({
     );
   }
 
-  // Calculate estimated points offset (e.g. sample mock credit card savings for preview)
   const normalPrice = selectedOffer ? selectedOffer.totalMinor : 0;
-  const estimatedSavings = Math.round(normalPrice * 0.35); // 35% estimate
-  const hackedPrice = normalPrice - estimatedSavings;
+  const currency = selectedOffer?.currency || "EUR";
+  const hackedPrice = savings ? savings.best.hackedPriceMinor : normalPrice;
+  const totalSavings = savings ? savings.best.savingsMinor : 0;
+  const savingsPct = savings ? savings.best.savingsPct : 0;
+  const heldPointsOffset = savings?.best.heldPointsOffsetMinor || 0;
+  const spendPointsOffset = savings?.best.spendPointsOffsetMinor || 0;
+  const earnBack = savings ? savings.best.earnBackMinor : 0;
+  const spendMonths = savings?.projection?.monthsUntilDeparture || 0;
+  const bestCardName = aiPlan?.headline || savings?.assumptions?.[0] || "Your Card";
 
   return (
     <div className="mx-auto max-w-4xl px-4 py-8 sm:py-12">
@@ -58,7 +108,9 @@ export function LiveResultsView({
 
       {/* Title */}
       <h1 className="mt-4 font-display text-3xl tracking-tight sm:text-5xl">
-        {trip.legs[0]?.from} → {trip.legs[trip.legs.length - 1]?.to}
+        {trip.legs && trip.legs.length > 0
+          ? trip.legs.map((l) => l.from).concat(trip.legs[trip.legs.length - 1]?.to).join(" → ")
+          : "Your Trip"}
       </h1>
       <p className="mt-2 text-sm text-foreground/70">
         Found {offers.length} available flight {offers.length === 1 ? "offer" : "offers"} from Duffel.
@@ -70,49 +122,122 @@ export function LiveResultsView({
           <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
             <div>
               <p className="text-xs font-semibold uppercase tracking-wider text-foreground/60">
-                Selected Offer Total
+                Airline Ticket Price
               </p>
-              <p className="mt-1 font-display text-4xl sm:text-5xl text-mint">
-                {formatMoney(selectedOffer.totalMinor, selectedOffer.currency)}
+              <p className="mt-1 font-display text-3xl sm:text-4xl text-mist/60 line-through">
+                {formatMoney(normalPrice, currency)}
               </p>
-              <p className="mt-1 text-xs text-foreground/60">
-                Expires {formatDate(selectedOffer.expiresAt)}
-              </p>
+              <div className="mt-3">
+                <span className="text-xs font-semibold uppercase tracking-wider text-mint">
+                  Calculated Hacked Price
+                </span>
+                <p className="mt-1 font-display text-5xl sm:text-6xl text-mint">
+                  {loadingSavings ? "Calculating…" : formatMoney(hackedPrice, currency)}
+                </p>
+                {savings && savingsPct > 0 && (
+                  <p className="text-sm font-semibold text-mint mt-1">
+                    You save {formatMoney(totalSavings, currency)} ({savingsPct}% off)
+                  </p>
+                )}
+              </div>
             </div>
             <div>
               <Link
                 href={`/book/${tripId}?offerId=${selectedOffer.offerId}`}
-                className={`${primaryClass} inline-block text-center`}
+                className={`${primaryClass} inline-block text-center px-8 py-3.5`}
               >
-                Book this flight
+                Book this flight →
               </Link>
             </div>
           </div>
 
-          <div className="mt-6 grid gap-3 sm:grid-cols-2 pt-6 border-t border-line/40">
+          {/* Savings Breakdown */}
+          <div className="mt-6 grid gap-3 sm:grid-cols-3 pt-6 border-t border-line/40">
+            {/* 1. Currently Held Points */}
             <div className="rounded-2xl border border-line bg-background/60 p-4">
-              <p className="text-xs text-foreground/60">Estimated Hacked Price</p>
+              <p className="text-xs text-foreground/60">Points You Hold (Discount)</p>
               <p className="mt-1 font-display text-2xl text-mint">
-                {formatMoney(hackedPrice, selectedOffer.currency)}
+                {loadingSavings ? "…" : formatMoney(heldPointsOffset, currency)}
               </p>
               <p className="text-xs text-foreground/60 mt-1">
-                Save ~{formatMoney(estimatedSavings, selectedOffer.currency)} using reward cards
+                {heldPointsOffset > 0
+                  ? "Wiped off from your held points"
+                  : "0 points currently held in wallet"}
               </p>
             </div>
+
+            {/* 2. Projected Monthly Spend Points */}
             <div className="rounded-2xl border border-line bg-background/60 p-4">
-              <p className="text-xs text-foreground/60">Best Card Recommendation</p>
-              <p className="mt-1 font-display text-xl text-marigold">
-                HDFC Infinia / Axis Atlas
+              <p className="text-xs text-foreground/60">Projected Spend Points</p>
+              <p className="mt-1 font-display text-2xl text-mint">
+                {loadingSavings ? "…" : formatMoney(spendPointsOffset, currency)}
               </p>
               <p className="text-xs text-foreground/60 mt-1">
-                Earn 5X reward points on direct flight booking
+                {spendMonths > 0 && spendPointsOffset > 0
+                  ? `Accumulated from ${spendMonths} months spending`
+                  : "0 accumulated spend points"}
               </p>
             </div>
+
+            {/* 3. New Rewards on Flight Purchase */}
+            <div className="rounded-2xl border border-line bg-background/60 p-4">
+              <p className="text-xs text-foreground/60">New Rewards Earned</p>
+              <p className="mt-1 font-display text-2xl text-marigold">
+                {loadingSavings ? "…" : formatMoney(earnBack, currency)}
+              </p>
+              <p className="text-xs text-foreground/60 mt-1">
+                Earned back on remaining cash payment
+              </p>
+            </div>
+          </div>
+
+          {/* AI Recommendation Box */}
+          <div className="mt-6 rounded-2xl border border-marigold/30 bg-marigold/10 p-5">
+            <div className="flex items-center gap-2">
+              <span className="size-2 rounded-full bg-marigold animate-pulse" />
+              <p className="text-xs font-bold uppercase tracking-wider text-marigold">
+                Gemini AI Recommendation · Best Card to Use
+              </p>
+            </div>
+            {loadingAi ? (
+              <p className="mt-2 text-sm text-foreground/70 animate-pulse">
+                Gemini is analyzing your cards and calculating the optimal booking route…
+              </p>
+            ) : aiPlan ? (
+              <div className="mt-3">
+                <p className="font-display text-xl text-mist font-semibold">
+                  {aiPlan.headline}
+                </p>
+                <p className="mt-1 text-sm text-foreground/80 leading-relaxed">
+                  {aiPlan.summary}
+                </p>
+
+                {/* Steps */}
+                {aiPlan.steps && aiPlan.steps.length > 0 && (
+                  <div className="mt-4 space-y-2.5 pt-3 border-t border-marigold/20">
+                    <p className="text-xs font-semibold text-foreground/60 uppercase">
+                      Action Plan
+                    </p>
+                    {aiPlan.steps.map((st, idx) => (
+                      <div key={idx} className="flex items-start gap-3 text-sm">
+                        <span className="font-display font-bold text-marigold shrink-0 mt-0.5">
+                          {idx + 1}.
+                        </span>
+                        <div>
+                          <span className="font-medium text-mist">{st.title}: </span>
+                          <span className="text-foreground/75">{st.detail}</span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            ) : null}
           </div>
         </div>
       )}
 
-      {/* List of all offers */}
+      {/* List of all flight offers from Duffel */}
       <section className="mt-10">
         <div className="flex items-center justify-between">
           <h2 className="font-display text-2xl">Available Flight Offers</h2>
@@ -120,7 +245,7 @@ export function LiveResultsView({
         </div>
 
         <div className="mt-4 space-y-3">
-          {offers.map((offer, idx) => {
+          {offers.map((offer) => {
             const isSelected = offer.offerId === selectedOfferId;
             return (
               <div
@@ -137,7 +262,7 @@ export function LiveResultsView({
                   <div className="space-y-3 flex-1">
                     {offer.slices.map((slice, sIdx) => (
                       <div key={sIdx} className="flex items-center gap-4 text-sm">
-                        <div className="min-w-24">
+                        <div className="min-w-28">
                           <span className="font-semibold text-mist">
                             {slice.carrier}
                           </span>
@@ -201,10 +326,9 @@ export function LiveResultsView({
           ← Plan another trip
         </Link>
         <span className="text-xs text-foreground/50">
-          Source: Live Duffel Sandbox Air API
+          Source: Live Duffel Sandbox Air API & Gemini AI
         </span>
       </div>
     </div>
   );
 }
-

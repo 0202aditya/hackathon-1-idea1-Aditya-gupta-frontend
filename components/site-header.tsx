@@ -6,8 +6,8 @@ import { AuthControl } from "@/components/auth/auth-control";
 import { useSessionUser } from "@/components/auth/use-session-user";
 
 const links = [
-  { href: "/plan", label: "Plan" },
   { href: "/wallet", label: "Wallet" },
+  { href: "/plan", label: "Plan a Trip" },
   { href: "/bookings", label: "Bookings" },
 ];
 
@@ -49,7 +49,10 @@ function Header({
   return (
     <header className="sticky top-0 z-20 border-b border-line bg-night/90 text-mist backdrop-blur">
       <div className="mx-auto flex max-w-5xl items-center justify-between gap-3 px-4 py-3">
-        <Link href="/" className="font-display text-lg font-extrabold tracking-tight">
+        <Link
+          href={showAppNav ? "/wallet" : "/"}
+          className="font-display text-lg font-extrabold tracking-tight hover:opacity-90"
+        >
           Una Milla
         </Link>
         {showAppNav ? (

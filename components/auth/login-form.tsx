@@ -27,7 +27,7 @@ export function LoginForm({ className }: { className?: string }) {
         setError(authErrorMessage(error));
         return;
       }
-      router.replace("/plan");
+      router.replace("/wallet");
       router.refresh();
     } catch (err) {
       setError(authErrorMessage(err));

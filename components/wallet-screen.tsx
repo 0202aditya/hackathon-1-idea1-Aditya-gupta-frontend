@@ -117,15 +117,15 @@ export function WalletScreen() {
   }
 
   async function handleSpendChange(cardId: string, category: string, value: string) {
-    const rupees = Math.max(0, parseInt(value, 10) || 0);
-    const paise = rupees * 100;
+    const euros = Math.max(0, parseInt(value, 10) || 0);
+    const cents = euros * 100;
 
     const card = cards.find((c) => c.cardId === cardId);
     if (!card) return;
 
     const nextSpend = {
       ...card.monthlySpendMinor,
-      [category]: paise,
+      [category]: cents,
     };
 
     setCards((prev) =>
@@ -159,7 +159,7 @@ export function WalletScreen() {
       </div>
       <h1 className="mt-2 font-display text-3xl tracking-tight sm:text-4xl">Your cards</h1>
       <p className="mt-3 max-w-lg text-sm leading-relaxed text-foreground/70">
-        Add the Indian credit cards you hold with your current points balance and estimated monthly spend.
+        Add the credit cards you hold with your current points balance and estimated monthly spend in €.
         Your wallet is saved securely to your account.
       </p>
 
@@ -254,11 +254,11 @@ export function WalletScreen() {
                 </div>
 
                 <div className="mt-5 pt-4 border-t border-line/40">
-                  <p className={`${labelClass} mb-3`}>Monthly spend (₹)</p>
+                  <p className={`${labelClass} mb-3`}>Monthly spend (€)</p>
                   <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
                     {categories.map(([key, label]) => {
                       const minorAmount = card.monthlySpendMinor?.[key as keyof typeof card.monthlySpendMinor] || 0;
-                      const rupeeAmount = minorAmount > 0 ? Math.round(minorAmount / 100) : "";
+                      const euroAmount = minorAmount > 0 ? Math.round(minorAmount / 100) : "";
 
                       return (
                         <label key={key} className="block">
@@ -267,8 +267,8 @@ export function WalletScreen() {
                             className={inputClass}
                             type="number"
                             min="0"
-                            placeholder="₹ 0"
-                            value={rupeeAmount}
+                            placeholder="€ 0"
+                            value={euroAmount}
                             onChange={(e) => handleSpendChange(card.cardId, key, e.target.value)}
                           />
                         </label>
@@ -280,6 +280,24 @@ export function WalletScreen() {
             );
           })}
         </ul>
+      )}
+
+      {/* Direct to Plan a Trip button when cards are present */}
+      {!loading && cards.length > 0 && (
+        <div className="mt-8 rounded-3xl border border-mint/40 bg-card p-6 flex flex-col sm:flex-row items-center justify-between gap-4">
+          <div>
+            <p className="font-display text-xl text-mint">Wallet Ready</p>
+            <p className="text-sm text-foreground/70 mt-1">
+              You have {cards.length} {cards.length === 1 ? "card" : "cards"} configured. Proceed to search flights and calculate your savings.
+            </p>
+          </div>
+          <a
+            href="/plan"
+            className="rounded-full bg-marigold px-8 py-3.5 text-sm font-semibold text-[#2a1a00] hover:opacity-90 transition-opacity shrink-0 text-center"
+          >
+            Plan a Trip →
+          </a>
+        </div>
       )}
     </div>
   );

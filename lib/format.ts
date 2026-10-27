@@ -1,15 +1,31 @@
 // Frontend/lib/format.ts
 
-export function formatMoney(minor: number, currency: string = "INR"): string {
-  const rupees = Math.round(minor / 100);
+export function formatMoney(minor: number, currency: string = "EUR"): string {
+  const amount = (minor || 0) / 100;
 
   if (currency === "INR") {
     // Format with Indian numbering system (e.g., 1,23,456)
-    const formatted = rupees.toLocaleString("en-IN");
+    const formatted = Math.round(amount).toLocaleString("en-IN");
     return `₹${formatted}`;
   }
 
-  return `${currency} ${rupees.toLocaleString()}`;
+  // Format EUR or international currencies with 2 decimals
+  const formatted = amount.toLocaleString("en-IE", {
+    minimumFractionDigits: amount % 1 === 0 ? 0 : 2,
+    maximumFractionDigits: 2,
+  });
+
+  if (currency === "EUR") {
+    return `€${formatted}`;
+  }
+  if (currency === "USD") {
+    return `$${formatted}`;
+  }
+  if (currency === "GBP") {
+    return `£${formatted}`;
+  }
+
+  return `${currency} ${formatted}`;
 }
 
 export function formatDate(dateStr: string): string {

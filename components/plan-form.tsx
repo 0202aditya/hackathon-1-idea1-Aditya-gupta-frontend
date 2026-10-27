@@ -1,10 +1,11 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { inputClass, labelClass, primaryClass } from "@/lib/classes";
 import { createTrip } from "@/lib/data/trips";
+import { getWallet } from "@/lib/data/wallet";
 import { Cabin, TripInput } from "@/lib/api-types";
 
 const cabins = ["Economy", "Premium economy", "Business", "First"];
@@ -35,12 +36,36 @@ export function PlanForm() {
   const [passengers, setPassengers] = useState(1);
   const [selectedCabin, setSelectedCabin] = useState("Economy");
   const [loading, setLoading] = useState(false);
+  const [checkingWallet, setCheckingWallet] = useState(true);
+  const [walletCardCount, setWalletCardCount] = useState<number | null>(null);
   const [error, setError] = useState<string | null>(null);
 
-  const destination = mode === "quick" ? "/results/quick" : "/results/full";
+  // Check if user has cards in their wallet
+  useEffect(() => {
+    async function checkCards() {
+      try {
+        setCheckingWallet(true);
+        const userCards = await getWallet();
+        setWalletCardCount(userCards?.length || 0);
+      } catch (err) {
+        console.error("Failed to check wallet:", err);
+        setWalletCardCount(0);
+      } finally {
+        setCheckingWallet(false);
+      }
+    }
+    checkCards();
+  }, []);
 
   async function handleSubmit(event: React.FormEvent) {
     event.preventDefault();
+
+    // Guard: Prevent planning without wallet cards
+    if (walletCardCount === 0) {
+      setError("Please add at least one credit card to your Wallet before planning a trip.");
+      return;
+    }
+
     setLoading(true);
     setError(null);
 
@@ -93,24 +118,61 @@ export function PlanForm() {
     });
   }
 
+  if (checkingWallet) {
+    return (
+      <div className="mx-auto max-w-xl px-4 py-16 text-center">
+        <p className="font-display text-lg animate-pulse text-mist">
+          Checking your wallet details…
+        </p>
+      </div>
+    );
+  }
+
+  // Intercept if no cards in wallet
+  if (walletCardCount === 0) {
+    return (
+      <div className="mx-auto max-w-xl px-4 py-12 sm:py-20 text-center">
+        <div className="rounded-3xl border border-line bg-card p-8 sm:p-10">
+          <div className="mx-auto size-12 rounded-full bg-marigold/15 flex items-center justify-center text-marigold text-xl font-bold">
+            💳
+          </div>
+          <h1 className="mt-4 font-display text-2xl sm:text-3xl">Set up your Wallet first</h1>
+          <p className="mt-3 text-sm leading-relaxed text-foreground/70 max-w-md mx-auto">
+            To calculate your points discount, hacked fare, and optimal card rewards, you need to add your credit cards first.
+          </p>
+          <div className="mt-8">
+            <Link href="/wallet" className={`${primaryClass} inline-block px-8 py-3.5`}>
+              Go to Wallet & Add Cards →
+            </Link>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="mx-auto max-w-xl px-4 py-8 sm:py-12">
       <div className="flex items-center justify-between">
         <p className="text-sm font-medium text-rust">Plan a trip</p>
-        <span className="rounded-full bg-mint/15 px-2.5 py-0.5 text-xs font-semibold text-mint">
-          Duffel live test
-        </span>
+        <div className="flex items-center gap-2">
+          <span className="rounded-full bg-mint/15 px-2.5 py-0.5 text-xs font-semibold text-mint">
+            Wallet connected ({walletCardCount} {walletCardCount === 1 ? "card" : "cards"})
+          </span>
+          <Link href="/wallet" className="text-xs text-foreground/60 hover:text-mist hover:underline">
+            Edit
+          </Link>
+        </div>
       </div>
       <h1 className="mt-2 font-display text-3xl tracking-tight sm:text-4xl">
         Where are you flying?
       </h1>
       <p className="mt-3 text-sm leading-relaxed text-foreground/70">
-        Enter your route and travel class to search live test flight offers powered by Duffel.
+        Enter your route and travel class. The engine will match live Duffel flight offers against your {walletCardCount} saved {walletCardCount === 1 ? "card" : "cards"}.
       </p>
 
       {error ? (
         <div className="mt-4 rounded-2xl border border-glow/40 bg-glow/15 p-4 text-sm text-glow">
-          <p className="font-semibold">Search notice</p>
+          <p className="font-semibold">Notice</p>
           <p className="mt-1">{error}</p>
         </div>
       ) : null}
