@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { primaryClass } from "@/lib/classes";
 import { useSessionUser } from "@/components/auth/use-session-user";
@@ -32,8 +33,14 @@ const cardsPreview = [
 ];
 
 export default function Home() {
+  const [mounted, setMounted] = useState(false);
   const user = useSessionUser();
-  const isLoggedIn = Boolean(user);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  const isLoggedIn = mounted && Boolean(user);
 
   return (
     <div className="relative min-h-[calc(100vh-64px)] w-full bg-[url('/hero-flight.png')] bg-cover bg-top bg-no-repeat">
