@@ -1,15 +1,9 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { inputClass, labelClass } from "@/lib/classes";
-
-type WalletCard = {
-  id: string;
-  name: string;
-  issuer: string;
-  points: string;
-  spend: Record<string, string>;
-};
+import { UserCard } from "@/lib/api-types";
+import { getWallet, saveWalletCard, removeWalletCard } from "@/lib/data/wallet";
 
 const categories = [
   ["flights", "Flights"],
@@ -19,7 +13,7 @@ const categories = [
   ["other", "Other"],
 ] as const;
 
-const catalog: { id: string; name: string; issuer: string }[] = [
+const catalog = [
   { id: "infinia", name: "HDFC Infinia", issuer: "HDFC Bank" },
   { id: "regalia", name: "HDFC Regalia Gold", issuer: "HDFC Bank" },
   { id: "millennia", name: "HDFC Millennia", issuer: "HDFC Bank" },
@@ -34,133 +28,257 @@ const catalog: { id: string; name: string; issuer: string }[] = [
   { id: "kotak", name: "Kotak White", issuer: "Kotak" },
 ];
 
-const emptySpend = { flights: "", hotels: "", dining: "", online: "", other: "" };
-
-const startingCards: WalletCard[] = [
-  {
-    id: "infinia",
-    name: "HDFC Infinia",
-    issuer: "HDFC Bank",
-    points: "45000",
-    spend: { flights: "25000", hotels: "8000", dining: "12000", online: "10000", other: "5000" },
-  },
-  {
-    id: "atlas",
-    name: "Axis Atlas",
-    issuer: "Axis Bank",
-    points: "28000",
-    spend: { flights: "15000", hotels: "4000", dining: "6000", online: "3000", other: "2000" },
-  },
-];
-
 export function WalletScreen() {
-  const [query, setQuery] = useState("");
-  const [cards, setCards] = useState(startingCards);
+  const [selectedCatalogId, setSelectedCatalogId] = useState("");
+  const [cards, setCards] = useState<UserCard[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [savingCardId, setSavingCardId] = useState<string | null>(null);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
-  const matches = useMemo(() => {
-    const text = query.trim().toLowerCase();
-    if (!text) return catalog;
-    return catalog.filter((card) => `${card.name} ${card.issuer}`.toLowerCase().includes(text));
-  }, [query]);
+  // Load existing wallet from backend / Supabase
+  useEffect(() => {
+    async function load() {
+      try {
+        setLoading(true);
+        const data = await getWallet();
+        setCards(data || []);
+      } catch (err) {
+        console.error("Failed to load wallet:", err);
+      } finally {
+        setLoading(false);
+      }
+    }
+    load();
+  }, []);
 
-  function addCard(id: string) {
-    const found = catalog.find((card) => card.id === id);
-    if (!found || cards.some((card) => card.id === id)) return;
-    setCards((current) => [
-      ...current,
-      { ...found, points: "", spend: { ...emptySpend } },
-    ]);
-    setQuery("");
+  async function handleAddCard(cardMeta: { id: string; name: string; issuer: string }) {
+    if (cards.some((item) => item.cardId === cardMeta.id)) return;
+
+    const newCard: UserCard = {
+      cardId: cardMeta.id,
+      card: {
+        id: cardMeta.id,
+        name: cardMeta.name,
+        issuer: cardMeta.issuer,
+      },
+      pointsBalance: 0,
+      monthlySpendMinor: {},
+    };
+
+    setCards((prev) => [...prev, newCard]);
+    setSelectedCatalogId("");
+
+    try {
+      setSavingCardId(cardMeta.id);
+      setErrorMessage(null);
+      await saveWalletCard(cardMeta.id, {
+        pointsBalance: 0,
+        monthlySpendMinor: {},
+      });
+    } catch (err: any) {
+      console.error("Failed to add card to wallet:", err);
+      setErrorMessage(err?.message || "Failed to save card to database.");
+    } finally {
+      setSavingCardId(null);
+    }
+  }
+
+  async function handleRemoveCard(cardId: string) {
+    setCards((prev) => prev.filter((item) => item.cardId !== cardId));
+    try {
+      await removeWalletCard(cardId);
+    } catch (err) {
+      console.error("Failed to remove card:", err);
+    }
+  }
+
+  async function handlePointsChange(cardId: string, value: string) {
+    const num = Math.max(0, parseInt(value, 10) || 0);
+    setCards((prev) =>
+      prev.map((c) => (c.cardId === cardId ? { ...c, pointsBalance: num } : c))
+    );
+
+    const card = cards.find((c) => c.cardId === cardId);
+    if (!card) return;
+
+    try {
+      setSavingCardId(cardId);
+      setErrorMessage(null);
+      await saveWalletCard(cardId, {
+        pointsBalance: num,
+        monthlySpendMinor: card.monthlySpendMinor,
+      });
+    } catch (err: any) {
+      console.error("Failed to update points:", err);
+      setErrorMessage(err?.message || "Failed to save points to database.");
+    } finally {
+      setSavingCardId(null);
+    }
+  }
+
+  async function handleSpendChange(cardId: string, category: string, value: string) {
+    const rupees = Math.max(0, parseInt(value, 10) || 0);
+    const paise = rupees * 100;
+
+    const card = cards.find((c) => c.cardId === cardId);
+    if (!card) return;
+
+    const nextSpend = {
+      ...card.monthlySpendMinor,
+      [category]: paise,
+    };
+
+    setCards((prev) =>
+      prev.map((c) =>
+        c.cardId === cardId ? { ...c, monthlySpendMinor: nextSpend } : c
+      )
+    );
+
+    try {
+      setSavingCardId(cardId);
+      setErrorMessage(null);
+      await saveWalletCard(cardId, {
+        pointsBalance: card.pointsBalance,
+        monthlySpendMinor: nextSpend,
+      });
+    } catch (err: any) {
+      console.error("Failed to update monthly spend:", err);
+      setErrorMessage(err?.message || "Failed to save monthly spend to database.");
+    } finally {
+      setSavingCardId(null);
+    }
   }
 
   return (
     <div className="mx-auto max-w-3xl px-4 py-8 sm:py-12">
-      <p className="text-sm font-medium text-rust">Wallet · Priya</p>
+      <div className="flex items-center justify-between">
+        <p className="text-sm font-medium text-rust">Wallet</p>
+        {savingCardId && (
+          <span className="text-xs text-mint animate-pulse">Saving changes…</span>
+        )}
+      </div>
       <h1 className="mt-2 font-display text-3xl tracking-tight sm:text-4xl">Your cards</h1>
       <p className="mt-3 max-w-lg text-sm leading-relaxed text-foreground/70">
-        Card name, points and monthly spend only. This preview never asks for a card number, and
-        changes stay on this page until you refresh.
+        Add the Indian credit cards you hold with your current points balance and estimated monthly spend.
+        Your wallet is saved securely to your account.
       </p>
 
-      <div className="relative mt-6">
-        <label className={labelClass} htmlFor="card-search">
-          Add a card
+      {errorMessage && (
+        <div className="mt-4 rounded-2xl border border-glow/40 bg-glow/15 p-4 text-sm text-glow">
+          <p className="font-semibold">Notice</p>
+          <p className="mt-1">{errorMessage}</p>
+        </div>
+      )}
+
+      {/* Add Card dropdown selector */}
+      <div className="mt-6 rounded-3xl border border-line bg-card p-4 sm:p-5">
+        <label className={labelClass} htmlFor="card-select">
+          Select a card to add
         </label>
-        <input
-          id="card-search"
-          className={inputClass}
-          placeholder="Search HDFC, Axis, SBI…"
-          value={query}
-          onChange={(event) => setQuery(event.target.value)}
-        />
-        <ul className="mt-2 max-h-52 overflow-auto rounded-2xl border border-line bg-card">
-          {matches.map((card) => {
-            const added = cards.some((item) => item.id === card.id);
+        <div className="mt-2 flex flex-col sm:flex-row gap-3">
+          <select
+            id="card-select"
+            className={`${inputClass} flex-1 cursor-pointer`}
+            value={selectedCatalogId}
+            onChange={(e) => setSelectedCatalogId(e.target.value)}
+          >
+            <option value="">-- Choose from popular Indian credit cards --</option>
+            {catalog.map((card) => {
+              const alreadyAdded = cards.some((item) => item.cardId === card.id);
+              return (
+                <option key={card.id} value={card.id} disabled={alreadyAdded}>
+                  {card.name} ({card.issuer}){alreadyAdded ? " — Already in wallet" : ""}
+                </option>
+              );
+            })}
+          </select>
+          <button
+            type="button"
+            disabled={!selectedCatalogId || cards.some((c) => c.cardId === selectedCatalogId)}
+            onClick={() => {
+              const found = catalog.find((c) => c.id === selectedCatalogId);
+              if (found) handleAddCard(found);
+            }}
+            className="rounded-full bg-marigold px-6 py-2.5 text-sm font-semibold text-[#2a1a00] hover:opacity-90 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer transition-opacity"
+          >
+            + Add Card
+          </button>
+        </div>
+      </div>
+
+      {loading ? (
+        <div className="mt-8 rounded-2xl border border-line bg-card p-8 text-center text-sm text-foreground/60">
+          Loading your wallet…
+        </div>
+      ) : cards.length === 0 ? (
+        <div className="mt-8 rounded-2xl border border-dashed border-line bg-card px-4 py-10 text-center">
+          <p className="font-display text-xl text-mist">Your wallet is empty</p>
+          <p className="mt-2 text-sm text-foreground/65 max-w-sm mx-auto">
+            Type your card name above (e.g. HDFC Infinia or Axis Atlas) to add it to your wallet.
+          </p>
+        </div>
+      ) : (
+        <ul className="mt-6 space-y-4">
+          {cards.map((card) => {
+            const cardName = card.card?.name || card.cardId;
+            const cardIssuer = card.card?.issuer || "Credit Card";
+
             return (
-              <li key={card.id} className="border-b border-line last:border-b-0">
-                <button
-                  type="button"
-                  disabled={added}
-                  onClick={() => addCard(card.id)}
-                  className="flex w-full items-center justify-between px-3 py-2.5 text-left text-sm hover:bg-white/10 disabled:cursor-default disabled:text-mist/35"
-                >
-                  <span>
-                    {card.name}
-                    <span className="mt-0.5 block text-xs text-foreground/55">{card.issuer}</span>
-                  </span>
-                  <span>{added ? "Added" : "Add"}</span>
-                </button>
+              <li key={card.cardId} className="rounded-3xl border border-line bg-card p-4 sm:p-6">
+                <div className="flex items-start justify-between gap-3">
+                  <div>
+                    <h2 className="font-display text-xl">{cardName}</h2>
+                    <p className="text-sm text-foreground/60">{cardIssuer}</p>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => handleRemoveCard(card.cardId)}
+                    className="text-sm font-medium text-rust hover:underline cursor-pointer"
+                  >
+                    Remove
+                  </button>
+                </div>
+
+                <div className="mt-5 grid gap-4 sm:grid-cols-2">
+                  <label className="block">
+                    <span className={labelClass}>Points balance</span>
+                    <input
+                      className={inputClass}
+                      type="number"
+                      min="0"
+                      placeholder="0"
+                      value={card.pointsBalance || ""}
+                      onChange={(e) => handlePointsChange(card.cardId, e.target.value)}
+                    />
+                  </label>
+                </div>
+
+                <div className="mt-5 pt-4 border-t border-line/40">
+                  <p className={`${labelClass} mb-3`}>Monthly spend (₹)</p>
+                  <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
+                    {categories.map(([key, label]) => {
+                      const minorAmount = card.monthlySpendMinor?.[key as keyof typeof card.monthlySpendMinor] || 0;
+                      const rupeeAmount = minorAmount > 0 ? Math.round(minorAmount / 100) : "";
+
+                      return (
+                        <label key={key} className="block">
+                          <span className="mb-1 block text-xs text-foreground/60">{label}</span>
+                          <input
+                            className={inputClass}
+                            type="number"
+                            min="0"
+                            placeholder="₹ 0"
+                            value={rupeeAmount}
+                            onChange={(e) => handleSpendChange(card.cardId, key, e.target.value)}
+                          />
+                        </label>
+                      );
+                    })}
+                  </div>
+                </div>
               </li>
             );
           })}
-          {matches.length === 0 ? (
-            <li className="px-3 py-4 text-sm text-foreground/60">No card matches that search.</li>
-          ) : null}
-        </ul>
-      </div>
-
-      {cards.length === 0 ? (
-        <p className="mt-8 rounded-2xl border border-dashed border-line bg-card px-4 py-8 text-center text-sm text-foreground/70">
-          No cards yet. Add one above. With an empty wallet, the results screen would show only the
-          normal fare.
-        </p>
-      ) : (
-        <ul className="mt-6 space-y-4">
-          {cards.map((card) => (
-            <li key={card.id} className="rounded-3xl border border-line bg-card p-4 sm:p-5">
-              <div className="flex items-start justify-between gap-3">
-                <div>
-                  <h2 className="font-display text-xl">{card.name}</h2>
-                  <p className="text-sm text-foreground/60">{card.issuer}</p>
-                </div>
-                <button
-                  type="button"
-                  onClick={() => setCards((current) => current.filter((item) => item.id !== card.id))}
-                  className="text-sm font-medium text-rust"
-                >
-                  Remove
-                </button>
-              </div>
-              <label className="mt-4 block max-w-xs">
-                <span className={labelClass}>Points balance</span>
-                <input className={inputClass} inputMode="numeric" defaultValue={card.points} />
-              </label>
-              <p className={`${labelClass} mt-4`}>Monthly spend (₹)</p>
-              <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
-                {categories.map(([key, label]) => (
-                  <label key={key} className="block">
-                    <span className="mb-1 block text-xs text-foreground/60">{label}</span>
-                    <input
-                      className={inputClass}
-                      inputMode="numeric"
-                      defaultValue={card.spend[key]}
-                      aria-label={`${card.name} ${label} spend`}
-                    />
-                  </label>
-                ))}
-              </div>
-            </li>
-          ))}
         </ul>
       )}
     </div>

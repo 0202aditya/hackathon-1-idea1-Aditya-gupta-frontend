@@ -34,8 +34,6 @@ export function ConfirmationView({ trip }: { trip: PreviewTrip }) {
           </li>
         ))}
       </ol>
-
-      <p className="mt-6 text-sm text-foreground/70">Passenger: Priya Sharma</p>
     </div>
   );
 }

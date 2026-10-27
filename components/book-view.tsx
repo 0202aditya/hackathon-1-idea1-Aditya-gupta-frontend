@@ -12,14 +12,14 @@ export function BookView({ trip }: { trip: PreviewTrip }) {
         </p>
         <h1 className="mt-4 font-display text-3xl tracking-tight sm:text-4xl">Passenger</h1>
         <p className="mt-2 text-sm text-foreground/70">
-          One form per traveller. This sample has one passenger, filled in so you can see the fields.
+          Enter traveller details for your flight booking.
         </p>
 
         <PreviewForm className="mt-6 space-y-4 rounded-3xl border border-line bg-card p-4 sm:p-6">
           <div className="grid gap-4 sm:grid-cols-2">
             <label className="block">
               <span className={labelClass}>Title</span>
-              <select className={inputClass} defaultValue="ms">
+              <select className={inputClass} defaultValue="mr">
                 <option value="mr">Mr</option>
                 <option value="ms">Ms</option>
                 <option value="mrs">Mrs</option>
@@ -29,38 +29,38 @@ export function BookView({ trip }: { trip: PreviewTrip }) {
             </label>
             <label className="block">
               <span className={labelClass}>Gender</span>
-              <select className={inputClass} defaultValue="f">
-                <option value="f">Female</option>
+              <select className={inputClass} defaultValue="m">
                 <option value="m">Male</option>
+                <option value="f">Female</option>
               </select>
             </label>
           </div>
           <div className="grid gap-4 sm:grid-cols-2">
             <label className="block">
               <span className={labelClass}>Given name</span>
-              <input className={inputClass} defaultValue="Priya" />
+              <input className={inputClass} placeholder="First / Given name" required />
             </label>
             <label className="block">
               <span className={labelClass}>Family name</span>
-              <input className={inputClass} defaultValue="Sharma" />
+              <input className={inputClass} placeholder="Last / Family name" required />
             </label>
           </div>
           <label className="block">
             <span className={labelClass}>Date of birth</span>
-            <input className={inputClass} type="date" defaultValue="1994-06-12" />
+            <input className={inputClass} type="date" required />
           </label>
           <div className="grid gap-4 sm:grid-cols-2">
             <label className="block">
               <span className={labelClass}>Email</span>
-              <input className={inputClass} type="email" defaultValue="priya@example.com" />
+              <input className={inputClass} type="email" placeholder="name@example.com" required />
             </label>
             <label className="block">
               <span className={labelClass}>Phone</span>
-              <input className={inputClass} type="tel" defaultValue="+919876543210" />
+              <input className={inputClass} type="tel" placeholder="+919876543210" required />
             </label>
           </div>
           <Link href={`/bookings/${trip.id}`} className={primaryClass}>
-            Confirm sample booking
+            Confirm booking
           </Link>
         </PreviewForm>
       </div>

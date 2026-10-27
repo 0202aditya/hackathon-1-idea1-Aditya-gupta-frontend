@@ -46,7 +46,7 @@ export function LoginForm({ className }: { className?: string }) {
           name="email"
           type="email"
           autoComplete="email"
-          placeholder="priya@example.com"
+          placeholder="your@email.com"
           required
         />
       </label>

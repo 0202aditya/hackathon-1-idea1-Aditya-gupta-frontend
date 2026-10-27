@@ -33,13 +33,7 @@ export default function Home() {
         <Link href="/plan" className={primaryClass}>
           Check a trip
         </Link>
-        <Link href="/results/quick" className={secondaryClass}>
-          Open a sample result
-        </Link>
       </div>
-      <p className="mt-4 max-w-xl text-sm text-foreground/60">
-        You can click through every screen. Nothing is searched, saved, or booked yet.
-      </p>
 
       <ul className="mt-14 grid gap-4 sm:grid-cols-3">
         {points.map((point) => (
