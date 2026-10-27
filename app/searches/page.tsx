@@ -103,7 +103,7 @@ export default function SearchesPage() {
             return (
               <div
                 key={item.id}
-                className="rounded-3xl border border-line bg-card p-6 sm:p-7 transition-all hover:border-line/80 shadow-sm"
+                className="rounded-3xl border border-line bg-card p-6 sm:p-7 card-hover shadow-sm"
               >
                 {/* Header: Route & Badges */}
                 <div className="flex flex-wrap items-center justify-between gap-3 border-b border-line/40 pb-4">

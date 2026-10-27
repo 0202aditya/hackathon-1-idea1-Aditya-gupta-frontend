@@ -4,7 +4,7 @@ export const inputClass =
 export const labelClass = "mb-1.5 block text-sm font-medium";
 
 export const primaryClass =
-  "inline-flex w-full items-center justify-center gap-2 rounded-full bg-marigold px-5 py-3 text-sm font-semibold text-[#2a1a00] shadow-[0_10px_30px_-8px_rgba(255,182,39,0.55)] transition hover:bg-[#e5a31f] sm:w-auto";
+  "inline-flex w-full items-center justify-center gap-2 rounded-full bg-marigold px-5 py-3 text-sm font-semibold text-[#2a1a00] shadow-[0_10px_30px_-8px_rgba(255,182,39,0.55)] transition-all duration-200 hover:bg-[#e5a31f] hover:shadow-[0_12px_35px_-6px_rgba(255,182,39,0.7)] active:scale-95 cursor-pointer sm:w-auto";
 
 export const secondaryClass =
-  "inline-flex w-full items-center justify-center gap-2 rounded-full border border-mist/30 bg-transparent px-5 py-3 text-sm font-semibold text-mist transition hover:bg-white/10 sm:w-auto";
+  "inline-flex w-full items-center justify-center gap-2 rounded-full border border-mist/30 bg-transparent px-5 py-3 text-sm font-semibold text-mist transition-all duration-200 hover:bg-white/10 hover:border-mist/60 active:scale-95 cursor-pointer sm:w-auto";

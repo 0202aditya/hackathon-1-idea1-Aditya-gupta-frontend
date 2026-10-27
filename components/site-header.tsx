@@ -26,8 +26,8 @@ function AppNav({ pathname, className }: { pathname: string | null; className: s
           <Link
             key={link.href}
             href={link.href}
-            className={`shrink-0 rounded-full px-3 py-1.5 text-sm ${
-              active ? "bg-dusk text-mist" : "text-mist/70 hover:bg-white/10 hover:text-mist"
+            className={`shrink-0 rounded-full px-3 py-1.5 text-sm transition-all duration-200 active:scale-95 ${
+              active ? "bg-dusk text-mist shadow-sm" : "text-mist/70 hover:bg-white/10 hover:text-mist"
             }`}
           >
             {link.label}

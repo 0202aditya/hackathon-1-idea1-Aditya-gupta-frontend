@@ -74,6 +74,34 @@ export default function Home() {
         )}
       </div>
 
+      {/* Hero Flight Arc Visual Showcase */}
+      <div className="mt-10 overflow-hidden rounded-3xl border border-line/60 bg-gradient-to-b from-card to-night shadow-2xl transition-all duration-300 hover:border-glow/40 hover:shadow-[0_15px_40px_-10px_rgba(255,143,90,0.25)]">
+        <div className="relative aspect-[16/10] sm:aspect-[21/10] w-full overflow-hidden">
+          <img
+            src="/hero-flight.png"
+            alt="Una Milla flight arc journey illustration"
+            className="h-full w-full object-cover object-center transition-transform duration-700 hover:scale-105"
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-background/95 via-transparent to-transparent pointer-events-none" />
+          <div className="absolute bottom-4 left-4 sm:bottom-6 sm:left-6 right-4 flex items-end justify-between">
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-wider text-glow">
+                Live Route & Points Optimization
+              </p>
+              <p className="font-display text-lg sm:text-2xl text-mist">
+                From Points Balance to Boarding Pass
+              </p>
+            </div>
+            <Link
+              href="/plan"
+              className="hidden sm:inline-flex rounded-full bg-marigold/90 px-5 py-2 text-xs font-bold text-[#2a1a00] hover:bg-marigold transition-all active:scale-95 shadow-lg"
+            >
+              Search Fares →
+            </Link>
+          </div>
+        </div>
+      </div>
+
       {/* Supported Cards Pill Strip */}
       <div className="mt-12 pt-8 border-t border-line/40">
         <p className="text-xs font-medium uppercase tracking-wider text-foreground/50">
@@ -103,7 +131,7 @@ export default function Home() {
           {features.map((feature) => (
             <div
               key={feature.title}
-              className="relative rounded-3xl border border-line bg-card p-6 flex flex-col justify-between"
+              className="relative rounded-3xl border border-line bg-card p-6 flex flex-col justify-between card-hover hover:border-line/90 shadow-sm"
             >
               <div>
                 <span className="font-display text-sm font-bold text-rust">
