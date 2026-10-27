@@ -16,7 +16,7 @@ const display = Bricolage_Grotesque({
 });
 
 export const metadata: Metadata = {
-  title: "Una Milla",
+  title: "A Una Milla",
   description: "See what a flight costs after your Indian credit card points.",
 };
 

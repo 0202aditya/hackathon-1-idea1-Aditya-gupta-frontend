@@ -43,7 +43,7 @@ export default function Home() {
 
       {/* Subhead */}
       <p className="mt-6 max-w-2xl text-lg sm:text-xl leading-relaxed text-foreground/80">
-        Una Milla compares live airline ticket prices against the reward points you hold, revealing your true <span className="text-mint font-semibold">Hacked Price</span> and the exact card to book with.
+        A Una Milla compares live airline ticket prices against the reward points you hold, revealing your true <span className="text-mint font-semibold">Hacked Price</span> and the exact card to book with.
       </p>
 
       {/* Hero CTA */}
@@ -82,7 +82,7 @@ export default function Home() {
       {/* 3 Step Feature Flow */}
       <div className="mt-14">
         <h2 className="font-display text-2xl sm:text-3xl tracking-tight">
-          How Una Milla hacks your ticket
+          How A Una Milla hacks your ticket
         </h2>
         <div className="mt-6 grid gap-4 sm:grid-cols-3">
           {features.map((feature) => (

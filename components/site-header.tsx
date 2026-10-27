@@ -54,7 +54,7 @@ function Header({
           href={showAppNav ? "/wallet" : "/"}
           className="font-display text-lg font-extrabold tracking-tight hover:opacity-90"
         >
-          Una Milla
+          A Una Milla
         </Link>
         {showAppNav ? (
           <AppNav pathname={pathname} className="hidden items-center gap-1 sm:flex" />
